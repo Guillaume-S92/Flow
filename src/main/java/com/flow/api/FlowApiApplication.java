@@ -1,4 +1,4 @@
-package com.flow.flow.api;
+package com.flow.api;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
