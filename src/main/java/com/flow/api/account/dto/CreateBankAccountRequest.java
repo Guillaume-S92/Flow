@@ -6,27 +6,14 @@ import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
 
-public class CreateBankAccountRequest {
+public record CreateBankAccountRequest(
 
-    @NotBlank(message = "Name may not be blank")
-    @Size(max = 100, message = "Name may not exceed 100 characters")
-    private String name;
-    @NotNull(message = "Initial balance may not be null")
-    private BigDecimal initialBalance;
+        @NotBlank(message = "Name may not be blank")
+        @Size(max = 100, message = "Name may not exceed 100 characters")
+        String name,
 
-    public String getName() {
-        return name;
-    }
+        @NotNull(message = "Initial balance may not be null")
+        BigDecimal initialBalance
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public BigDecimal getInitialBalance() {
-        return initialBalance;
-    }
-
-    public void setInitialBalance(BigDecimal initialBalance) {
-        this.initialBalance = initialBalance;
-    }
+) {
 }

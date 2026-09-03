@@ -1,5 +1,7 @@
 package com.flow.api.account;
 
+import com.flow.api.account.dto.BankAccountResponse;
+import com.flow.api.account.dto.CreateBankAccountRequest;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -46,5 +48,23 @@ public class BankAccountService {
 
         } else {
             return Optional.empty();}
+  }
+
+  public BankAccountResponse createBankAccount(CreateBankAccountRequest request) {
+
+      BankAccount bankAccount = new BankAccount(
+              request.name(),
+              request.initialBalance()
+      );
+
+      BankAccount savedBankAccount = bankAccountRepository.save(bankAccount);
+
+      return new BankAccountResponse(
+              savedBankAccount.getId(),
+              savedBankAccount.getName(),
+              savedBankAccount.getInitialBalance(),
+              savedBankAccount.getCreationDate()
+      );
+
   }
 }
