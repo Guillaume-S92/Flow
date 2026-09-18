@@ -15,10 +15,9 @@ import java.util.Optional;
 @RequestMapping("/api/bank-accounts")
 public class BankAccountController {
 
-    @Autowired
-    private BankAccountService bankAccountService;
+    private final BankAccountService bankAccountService;
 
-    public BankAccountController(BankAccountRepository bankAccountRepository) {
+    public BankAccountController(BankAccountService bankAccountService) {
         this.bankAccountService = bankAccountService;
     }
 
