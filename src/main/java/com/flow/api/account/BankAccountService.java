@@ -19,11 +19,6 @@ public class BankAccountService {
         this.bankAccountRepository = bankAccountRepository;
     }
 
-    public BankAccount createBankAccount(String name, BigDecimal balance) {
-        BankAccount bankAccount = new BankAccount(name,balance);
-
-        return bankAccountRepository.save(bankAccount);
-    }
 
     public Optional<BankAccountResponse> findBankAccountById(Long id) {
 
