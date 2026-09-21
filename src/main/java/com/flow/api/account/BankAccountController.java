@@ -5,6 +5,7 @@ import com.flow.api.account.dto.CreateBankAccountRequest;
 import com.flow.api.account.dto.UpdateBankAccountRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,10 +23,11 @@ public class BankAccountController {
     }
 
     @PostMapping
-    public BankAccountResponse addBankAccount(
-            @Valid @RequestBody CreateBankAccountRequest request
-    ) {
-        return bankAccountService.createBankAccount(request);
+    public ResponseEntity<BankAccountResponse> addBankAccount(@Valid @RequestBody CreateBankAccountRequest request){
+        BankAccountResponse response =
+                bankAccountService.createBankAccount(request);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/{id}")
