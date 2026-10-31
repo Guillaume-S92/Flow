@@ -4,7 +4,12 @@ import com.flow.api.account.BankAccount;
 import com.flow.api.account.BankAccountRepository;
 import com.flow.api.transaction.dto.BankTransactionResponse;
 import com.flow.api.transaction.dto.CreateBankTransactionRequest;
+import com.flow.api.transaction.dto.UpdateBankTransactionRequest;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BankTransactionService {
@@ -46,4 +51,91 @@ public class BankTransactionService {
                 savedBankTransaction.getBankAccount().getId()
         );
     }
+
+    public Optional <BankTransactionResponse> getBankTransactionById(Long id) {
+
+        Optional<BankTransaction> bankTransactionOptional = bankTransactionRepository.findById(id);
+
+        if (bankTransactionOptional.isPresent()) {
+
+            BankTransaction foundBankTransaction = bankTransactionOptional.get();
+
+            BankTransactionResponse response = new BankTransactionResponse(
+                    foundBankTransaction.getId(),
+                    foundBankTransaction.getTransactionDetails(),
+                    foundBankTransaction.getAmount(),
+                    foundBankTransaction.getTransactionType(),
+                    foundBankTransaction.getTransactionDate(),
+                    foundBankTransaction.getBankAccount().getId()
+            );
+            return Optional.of(response);
+        }else  {
+            return Optional.empty();
+        }
+    }
+
+    public List <BankTransactionResponse> findAllBankTransactions() {
+
+        List<BankTransaction> bankTransactions =  bankTransactionRepository.findAll();
+
+        List<BankTransactionResponse> responses = new ArrayList<>();
+        for (BankTransaction bankTransaction : bankTransactions) {
+            BankTransactionResponse response = new BankTransactionResponse(
+                    bankTransaction.getId(),
+                    bankTransaction.getTransactionDetails(),
+                    bankTransaction.getAmount(),
+                    bankTransaction.getTransactionType(),
+                    bankTransaction.getTransactionDate(),
+                    bankTransaction.getBankAccount().getId()
+            );
+            responses.add(response);
+    }
+        return responses;
+    }
+
+    public boolean deleteBankTransactionById(Long id) {
+        if (bankTransactionRepository.existsById(id)) {
+            bankTransactionRepository.deleteById(id);
+            return true;
+        }
+        return false;
+    }
+
+    public Optional<BankTransactionResponse> updateBankTransaction(Long id, UpdateBankTransactionRequest request) {
+
+        Optional<BankTransaction> bankTransactionOptional = bankTransactionRepository.findById(id);
+
+        if (bankTransactionOptional.isPresent()) {
+
+            BankTransaction bankTransaction = bankTransactionOptional.get();
+
+            BankAccount bankAccount = bankAccountRepository
+                    .findById(request.bankAccountId())
+                    .orElseThrow();
+
+            bankTransaction.setTransactionDetails(request.transactionDetails());
+            bankTransaction.setAmount(request.amount());
+            bankTransaction.setTransactionType(request.transactionType());
+            bankTransaction.setTransactionDate(request.transactionDate());
+            bankTransaction.setBankAccount(bankAccount);
+
+            bankTransactionRepository.save(bankTransaction);
+
+            BankTransactionResponse response =
+                    new BankTransactionResponse(
+                            bankTransaction.getId(),
+                            bankTransaction.getTransactionDetails(),
+                            bankTransaction.getAmount(),
+                            bankTransaction.getTransactionType(),
+                            bankTransaction.getTransactionDate(),
+                            bankTransaction.getBankAccount().getId()
+                    );
+
+            return Optional.of(response);
+
+        } else {
+            return Optional.empty();
+        }
+    }
 }
+
