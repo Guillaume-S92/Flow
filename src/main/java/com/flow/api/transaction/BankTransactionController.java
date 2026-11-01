@@ -14,11 +14,17 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/bank-transaction")
+@RequestMapping("/api/bank-transactions")
 public class BankTransactionController {
 
-    @Autowired
-    BankTransactionService bankTransactionService;
+
+    private final BankTransactionService bankTransactionService;
+
+    public BankTransactionController(
+            BankTransactionService bankTransactionService
+    ) {
+        this.bankTransactionService = bankTransactionService;
+    }
 
     @PostMapping
     public ResponseEntity<BankTransactionResponse> addBankTransaction(@Valid @RequestBody CreateBankTransactionRequest request) {
@@ -57,12 +63,14 @@ public class BankTransactionController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<BankTransactionResponse> deleteBankTransaction(@PathVariable Long id) {
-        boolean canDelete = bankTransactionService.deleteBankTransactionById(id);
+    public ResponseEntity<Void> deleteBankTransaction(@PathVariable Long id) {
+
+        boolean canDelete =
+                bankTransactionService.deleteBankTransactionById(id);
 
         if (canDelete) {
-            return ResponseEntity.ok().build();
-        } else   {
+            return ResponseEntity.noContent().build();
+        } else {
             return ResponseEntity.notFound().build();
         }
     }
