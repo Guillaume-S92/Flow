@@ -2,6 +2,7 @@ package com.flow.api.transaction;
 
 import com.flow.api.account.BankAccount;
 import com.flow.api.account.BankAccountRepository;
+import com.flow.api.exception.BankAccountNotFoundException;
 import com.flow.api.transaction.dto.BankTransactionResponse;
 import com.flow.api.transaction.dto.CreateBankTransactionRequest;
 import com.flow.api.transaction.dto.UpdateBankTransactionRequest;
@@ -29,7 +30,7 @@ public class BankTransactionService {
 
         BankAccount bankAccount = bankAccountRepository
                 .findById(request.bankAccountId())
-                .orElseThrow();
+                .orElseThrow(() -> new BankAccountNotFoundException(request.bankAccountId()));
 
         BankTransaction bankTransaction = new BankTransaction(
                 request.transactionDetails(),
@@ -111,7 +112,7 @@ public class BankTransactionService {
 
             BankAccount bankAccount = bankAccountRepository
                     .findById(request.bankAccountId())
-                    .orElseThrow();
+                    .orElseThrow(() -> new BankAccountNotFoundException(request.bankAccountId()));
 
             bankTransaction.setTransactionDetails(request.transactionDetails());
             bankTransaction.setAmount(request.amount());
