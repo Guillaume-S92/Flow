@@ -3,6 +3,7 @@ package com.flow.api.account;
 import com.flow.api.account.dto.BankAccountResponse;
 import com.flow.api.account.dto.CreateBankAccountRequest;
 import com.flow.api.account.dto.UpdateBankAccountRequest;
+import com.flow.api.exception.BankAccountNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -20,29 +21,19 @@ public class BankAccountService {
     }
 
 
-    public Optional<BankAccountResponse> findBankAccountById(Long id) {
+    public BankAccountResponse findBankAccountById(Long id) {
 
-        Optional<BankAccount> optionalBankAccount= bankAccountRepository.findById(id);
+        BankAccount bankAccount = bankAccountRepository
+                .findById(id)
+                .orElseThrow(() -> new BankAccountNotFoundException(id));
 
-        if(optionalBankAccount.isPresent()){
-
-            BankAccount foundBankAccount = optionalBankAccount.get();
-
-            BankAccountResponse response = new BankAccountResponse(
-                    foundBankAccount.getId(),
-                    foundBankAccount.getName(),
-                    foundBankAccount.getInitialBalance(),
-                    foundBankAccount.getCreationDate()
-            );
-
-            return Optional.of(response);
-
-        } else {
-                return Optional.empty();
-
-        }
-
-   }
+        return new BankAccountResponse(
+                bankAccount.getId(),
+                bankAccount.getName(),
+                bankAccount.getInitialBalance(),
+                bankAccount.getCreationDate()
+        );
+    }
 
     public List<BankAccountResponse> findAllBankAccounts() {
 
@@ -64,36 +55,33 @@ public class BankAccountService {
         return responses;
     }
 
-  public boolean deleteBankAccountById(Long id) {
+    public void deleteBankAccountById(Long id) {
 
-        if(bankAccountRepository.existsById(id)){
-            bankAccountRepository.deleteById(id);
-            return true;
+        if (!bankAccountRepository.existsById(id)) {
+            throw new BankAccountNotFoundException(id);
         }
 
-        return false;
-  }
+        bankAccountRepository.deleteById(id);
+    }
 
-  public Optional<BankAccountResponse> updateBankAccount(Long id, UpdateBankAccountRequest request) {
-        Optional<BankAccount> optionalBankAccount = bankAccountRepository.findById(id);
+    public BankAccountResponse updateBankAccount(Long id, UpdateBankAccountRequest request) {
 
-      if (optionalBankAccount.isPresent()) {
-            BankAccount bankAccount = optionalBankAccount.get();
-            bankAccount.setName(request.name());
-            bankAccount.setInitialBalance(request.initialBalance());
-            bankAccountRepository.save(bankAccount);
+        BankAccount bankAccount = bankAccountRepository
+                .findById(id)
+                .orElseThrow(() -> new BankAccountNotFoundException(id));
 
-            BankAccountResponse response = new BankAccountResponse(
-                    bankAccount.getId(),
-                    bankAccount.getName(),
-                    bankAccount.getInitialBalance(),
-                    bankAccount.getCreationDate()
-            );
-            return Optional.of(response);
+        bankAccount.setName(request.name());
+        bankAccount.setInitialBalance(request.initialBalance());
 
-        } else {
-            return Optional.empty();}
-  }
+        bankAccountRepository.save(bankAccount);
+
+        return new BankAccountResponse(
+                bankAccount.getId(),
+                bankAccount.getName(),
+                bankAccount.getInitialBalance(),
+                bankAccount.getCreationDate()
+        );
+    }
 
   public BankAccountResponse createBankAccount(CreateBankAccountRequest request) {
 

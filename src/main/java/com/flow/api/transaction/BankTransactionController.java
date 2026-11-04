@@ -35,14 +35,12 @@ public class BankTransactionController {
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<BankTransactionResponse> getBankTransactionById(@PathVariable Long id) {
-        Optional<BankTransactionResponse> bankTransaction = bankTransactionService.getBankTransactionById(id);
-        if (bankTransaction.isPresent()) {
-            return ResponseEntity.ok(bankTransaction.get());
-        } else  {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<BankTransactionResponse> getBankTransactionById(
+            @PathVariable Long id
+    ) {
+        BankTransactionResponse bankTransaction = bankTransactionService.getBankTransactionById(id);
 
+        return ResponseEntity.ok(bankTransaction);
     }
 
     @GetMapping
@@ -53,25 +51,17 @@ public class BankTransactionController {
 
     @PutMapping("/{id}")
     public ResponseEntity<BankTransactionResponse> updateBankTransaction(@PathVariable Long id, @Valid @RequestBody UpdateBankTransactionRequest request) {
-        Optional<BankTransactionResponse> updatebankTransaction = bankTransactionService.updateBankTransaction(id, request);
 
-        if (updatebankTransaction.isPresent()) {
-            return ResponseEntity.ok(updatebankTransaction.get());
-        } else   {
-            return ResponseEntity.notFound().build();
-        }
+        BankTransactionResponse updatedBankTransaction = bankTransactionService.updateBankTransaction(id, request);
+
+        return ResponseEntity.ok(updatedBankTransaction);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBankTransaction(@PathVariable Long id) {
 
-        boolean canDelete =
-                bankTransactionService.deleteBankTransactionById(id);
+        bankTransactionService.deleteBankTransactionById(id);
 
-        if (canDelete) {
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.noContent().build();
     }
 }

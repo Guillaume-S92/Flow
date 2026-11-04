@@ -31,17 +31,10 @@ public class BankAccountController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BankAccountResponse> getBankAccountById(
-            @PathVariable Long id
-    ) {
-        Optional<BankAccountResponse> bankAccount =
-                bankAccountService.findBankAccountById(id);
+    public ResponseEntity<BankAccountResponse> getBankAccountById(@PathVariable Long id) {
+        BankAccountResponse bankAccount = bankAccountService.findBankAccountById(id);
 
-        if (bankAccount.isPresent()) {
-            return ResponseEntity.ok(bankAccount.get());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(bankAccount);
     }
 
     @GetMapping
@@ -50,32 +43,18 @@ public class BankAccountController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<BankAccountResponse> updateBankAccount(
-            @PathVariable Long id,
-            @Valid @RequestBody UpdateBankAccountRequest request
-    ) {
-        Optional<BankAccountResponse>  updateBankAccount =
-                bankAccountService.updateBankAccount(id, request);
+    public ResponseEntity<BankAccountResponse> updateBankAccount(@PathVariable Long id, @Valid @RequestBody UpdateBankAccountRequest request) {
 
-        if (updateBankAccount.isPresent()) {
-            return ResponseEntity.ok(updateBankAccount.get());
-        } else  {
-            return ResponseEntity.notFound().build();
-        }
+        BankAccountResponse updatedBankAccount = bankAccountService.updateBankAccount(id, request);
 
+        return ResponseEntity.ok(updatedBankAccount);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteBankAccountById(
-            @PathVariable Long id
-    ) {
-        boolean deleted = bankAccountService.deleteBankAccountById(id);
+    public ResponseEntity<Void> deleteBankAccountById(@PathVariable Long id) {
+       bankAccountService.deleteBankAccountById(id);
 
-        if (deleted) {
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+       return ResponseEntity.noContent().build();
     }
 
 

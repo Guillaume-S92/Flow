@@ -3,6 +3,7 @@ package com.flow.api.transaction;
 import com.flow.api.account.BankAccount;
 import com.flow.api.account.BankAccountRepository;
 import com.flow.api.exception.BankAccountNotFoundException;
+import com.flow.api.exception.BankTransactionNotFoundException;
 import com.flow.api.transaction.dto.BankTransactionResponse;
 import com.flow.api.transaction.dto.CreateBankTransactionRequest;
 import com.flow.api.transaction.dto.UpdateBankTransactionRequest;
@@ -53,26 +54,20 @@ public class BankTransactionService {
         );
     }
 
-    public Optional <BankTransactionResponse> getBankTransactionById(Long id) {
+    public BankTransactionResponse getBankTransactionById(Long id) {
 
-        Optional<BankTransaction> bankTransactionOptional = bankTransactionRepository.findById(id);
+        BankTransaction bankTransaction = bankTransactionRepository
+                .findById(id)
+                .orElseThrow(() -> new BankTransactionNotFoundException(id));
 
-        if (bankTransactionOptional.isPresent()) {
-
-            BankTransaction foundBankTransaction = bankTransactionOptional.get();
-
-            BankTransactionResponse response = new BankTransactionResponse(
-                    foundBankTransaction.getId(),
-                    foundBankTransaction.getTransactionDetails(),
-                    foundBankTransaction.getAmount(),
-                    foundBankTransaction.getTransactionType(),
-                    foundBankTransaction.getTransactionDate(),
-                    foundBankTransaction.getBankAccount().getId()
-            );
-            return Optional.of(response);
-        }else  {
-            return Optional.empty();
-        }
+        return new BankTransactionResponse(
+                bankTransaction.getId(),
+                bankTransaction.getTransactionDetails(),
+                bankTransaction.getAmount(),
+                bankTransaction.getTransactionType(),
+                bankTransaction.getTransactionDate(),
+                bankTransaction.getBankAccount().getId()
+        );
     }
 
     public List <BankTransactionResponse> findAllBankTransactions() {
@@ -94,49 +89,46 @@ public class BankTransactionService {
         return responses;
     }
 
-    public boolean deleteBankTransactionById(Long id) {
-        if (bankTransactionRepository.existsById(id)) {
-            bankTransactionRepository.deleteById(id);
-            return true;
+    public void deleteBankTransactionById(Long id) {
+
+        if (!bankTransactionRepository.existsById(id)) {
+            throw new BankTransactionNotFoundException(id);
         }
-        return false;
+
+        bankTransactionRepository.deleteById(id);
     }
 
-    public Optional<BankTransactionResponse> updateBankTransaction(Long id, UpdateBankTransactionRequest request) {
+    public BankTransactionResponse updateBankTransaction(
+            Long id,
+            UpdateBankTransactionRequest request
+    ) {
 
-        Optional<BankTransaction> bankTransactionOptional = bankTransactionRepository.findById(id);
+        BankTransaction bankTransaction = bankTransactionRepository
+                .findById(id)
+                .orElseThrow(() -> new BankTransactionNotFoundException(id));
 
-        if (bankTransactionOptional.isPresent()) {
+        BankAccount bankAccount = bankAccountRepository
+                .findById(request.bankAccountId())
+                .orElseThrow(() ->
+                        new BankAccountNotFoundException(request.bankAccountId())
+                );
 
-            BankTransaction bankTransaction = bankTransactionOptional.get();
+        bankTransaction.setTransactionDetails(request.transactionDetails());
+        bankTransaction.setAmount(request.amount());
+        bankTransaction.setTransactionType(request.transactionType());
+        bankTransaction.setTransactionDate(request.transactionDate());
+        bankTransaction.setBankAccount(bankAccount);
 
-            BankAccount bankAccount = bankAccountRepository
-                    .findById(request.bankAccountId())
-                    .orElseThrow(() -> new BankAccountNotFoundException(request.bankAccountId()));
+        bankTransactionRepository.save(bankTransaction);
 
-            bankTransaction.setTransactionDetails(request.transactionDetails());
-            bankTransaction.setAmount(request.amount());
-            bankTransaction.setTransactionType(request.transactionType());
-            bankTransaction.setTransactionDate(request.transactionDate());
-            bankTransaction.setBankAccount(bankAccount);
-
-            bankTransactionRepository.save(bankTransaction);
-
-            BankTransactionResponse response =
-                    new BankTransactionResponse(
-                            bankTransaction.getId(),
-                            bankTransaction.getTransactionDetails(),
-                            bankTransaction.getAmount(),
-                            bankTransaction.getTransactionType(),
-                            bankTransaction.getTransactionDate(),
-                            bankTransaction.getBankAccount().getId()
-                    );
-
-            return Optional.of(response);
-
-        } else {
-            return Optional.empty();
-        }
+        return new BankTransactionResponse(
+                bankTransaction.getId(),
+                bankTransaction.getTransactionDetails(),
+                bankTransaction.getAmount(),
+                bankTransaction.getTransactionType(),
+                bankTransaction.getTransactionDate(),
+                bankTransaction.getBankAccount().getId()
+        );
     }
 }
 
