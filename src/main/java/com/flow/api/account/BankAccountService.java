@@ -3,7 +3,10 @@ package com.flow.api.account;
 import com.flow.api.account.dto.BankAccountResponse;
 import com.flow.api.account.dto.CreateBankAccountRequest;
 import com.flow.api.account.dto.UpdateBankAccountRequest;
+import com.flow.api.exception.BankAccountInUseException;
 import com.flow.api.exception.BankAccountNotFoundException;
+import com.flow.api.transaction.BankTransactionRepository;
+import com.flow.api.transaction.BankTransactionService;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -15,10 +18,13 @@ import java.util.Optional;
 public class BankAccountService {
 
     private final BankAccountRepository bankAccountRepository;
+    private final BankTransactionRepository bankTransactionRepository;
 
-    public BankAccountService(BankAccountRepository bankAccountRepository) {
+    public BankAccountService(BankAccountRepository bankAccountRepository, BankTransactionRepository bankTransactionRepository) {
         this.bankAccountRepository = bankAccountRepository;
+        this.bankTransactionRepository = bankTransactionRepository;
     }
+
 
 
     public BankAccountResponse findBankAccountById(Long id) {
@@ -59,6 +65,10 @@ public class BankAccountService {
 
         if (!bankAccountRepository.existsById(id)) {
             throw new BankAccountNotFoundException(id);
+        }
+
+        if (bankTransactionRepository.existsByBankAccount_Id(id)) {
+            throw new BankAccountInUseException(id);
         }
 
         bankAccountRepository.deleteById(id);
