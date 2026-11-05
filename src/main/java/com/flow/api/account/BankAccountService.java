@@ -6,13 +6,10 @@ import com.flow.api.account.dto.UpdateBankAccountRequest;
 import com.flow.api.exception.BankAccountInUseException;
 import com.flow.api.exception.BankAccountNotFoundException;
 import com.flow.api.transaction.BankTransactionRepository;
-import com.flow.api.transaction.BankTransactionService;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class BankAccountService {
