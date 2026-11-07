@@ -73,10 +73,14 @@ public class BankTransactionService {
 
     public List <BankTransactionResponse> findAllBankTransactions() {
 
-        List<BankTransaction> bankTransactions =  bankTransactionRepository.findAll();
+        List<BankTransaction> bankTransactions =  bankTransactionRepository.findAllWithBankAccount();
 
         List<BankTransactionResponse> responses = new ArrayList<>();
         for (BankTransaction bankTransaction : bankTransactions) {
+
+            String bankAccountName =
+                    bankTransaction.getBankAccount().getName();
+
             BankTransactionResponse response = new BankTransactionResponse(
                     bankTransaction.getId(),
                     bankTransaction.getTransactionDetails(),
