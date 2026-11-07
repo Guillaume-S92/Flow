@@ -8,6 +8,7 @@ import com.flow.api.transaction.dto.BankTransactionResponse;
 import com.flow.api.transaction.dto.CreateBankTransactionRequest;
 import com.flow.api.transaction.dto.UpdateBankTransactionRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -98,6 +99,7 @@ public class BankTransactionService {
         bankTransactionRepository.deleteById(id);
     }
 
+    @Transactional
     public BankTransactionResponse updateBankTransaction(
             Long id,
             UpdateBankTransactionRequest request
@@ -119,7 +121,7 @@ public class BankTransactionService {
         bankTransaction.setTransactionDate(request.transactionDate());
         bankTransaction.setBankAccount(bankAccount);
 
-        bankTransactionRepository.save(bankTransaction);
+
 
         return new BankTransactionResponse(
                 bankTransaction.getId(),

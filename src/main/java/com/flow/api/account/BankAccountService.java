@@ -6,6 +6,7 @@ import com.flow.api.account.dto.UpdateBankAccountRequest;
 import com.flow.api.exception.BankAccountInUseException;
 import com.flow.api.exception.BankAccountNotFoundException;
 import com.flow.api.transaction.BankTransactionRepository;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -71,6 +72,7 @@ public class BankAccountService {
         bankAccountRepository.deleteById(id);
     }
 
+    @Transactional
     public BankAccountResponse updateBankAccount(Long id, UpdateBankAccountRequest request) {
 
         BankAccount bankAccount = bankAccountRepository
@@ -80,7 +82,6 @@ public class BankAccountService {
         bankAccount.setName(request.name());
         bankAccount.setInitialBalance(request.initialBalance());
 
-        bankAccountRepository.save(bankAccount);
 
         return new BankAccountResponse(
                 bankAccount.getId(),
