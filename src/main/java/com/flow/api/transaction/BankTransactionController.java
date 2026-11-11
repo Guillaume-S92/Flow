@@ -6,6 +6,8 @@ import com.flow.api.transaction.dto.CreateBankTransactionRequest;
 import com.flow.api.transaction.dto.UpdateBankTransactionRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,8 +46,8 @@ public class BankTransactionController {
     }
 
     @GetMapping
-    public ResponseEntity<List<BankTransactionResponse>> getAllBankTransactions() {
-        return ResponseEntity.ok(bankTransactionService.findAllBankTransactions());
+    public ResponseEntity<Page<BankTransactionResponse>> getAllBankTransactions(Pageable pageable) {
+        return ResponseEntity.ok(bankTransactionService.findAllBankTransactions(pageable));
     }
 
 

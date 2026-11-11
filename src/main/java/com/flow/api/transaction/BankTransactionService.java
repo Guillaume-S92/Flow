@@ -7,8 +7,11 @@ import com.flow.api.exception.BankTransactionNotFoundException;
 import com.flow.api.transaction.dto.BankTransactionResponse;
 import com.flow.api.transaction.dto.CreateBankTransactionRequest;
 import com.flow.api.transaction.dto.UpdateBankTransactionRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,27 +74,21 @@ public class BankTransactionService {
         );
     }
 
-    public List <BankTransactionResponse> findAllBankTransactions() {
+    public Page<BankTransactionResponse> findAllBankTransactions(Pageable pageable) {
 
-        List<BankTransaction> bankTransactions =  bankTransactionRepository.findAllWithBankAccount();
+        Page<BankTransaction> bankTransactions =
+                bankTransactionRepository.findAllWithBankAccount(pageable);
 
-        List<BankTransactionResponse> responses = new ArrayList<>();
-        for (BankTransaction bankTransaction : bankTransactions) {
-
-            String bankAccountName =
-                    bankTransaction.getBankAccount().getName();
-
-            BankTransactionResponse response = new BankTransactionResponse(
-                    bankTransaction.getId(),
-                    bankTransaction.getTransactionDetails(),
-                    bankTransaction.getAmount(),
-                    bankTransaction.getTransactionType(),
-                    bankTransaction.getTransactionDate(),
-                    bankTransaction.getBankAccount().getId()
-            );
-            responses.add(response);
-    }
-        return responses;
+        return bankTransactions.map(bankTransaction ->
+                new BankTransactionResponse(
+                        bankTransaction.getId(),
+                        bankTransaction.getTransactionDetails(),
+                        bankTransaction.getAmount(),
+                        bankTransaction.getTransactionType(),
+                        bankTransaction.getTransactionDate(),
+                        bankTransaction.getBankAccount().getId()
+                )
+        );
     }
 
     public void deleteBankTransactionById(Long id) {
