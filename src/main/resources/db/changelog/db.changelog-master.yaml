@@ -83,3 +83,27 @@ databaseChangeLog:
             referencedTableName: bank_account
             referencedColumnNames: id
             constraintName: fk_bank_transaction_bank_account
+
+  - changeSet:
+      id: 003-add-index-bank-transaction-date
+      author: guillaume
+      changes:
+        - createIndex:
+            tableName: bank_transaction
+            indexName: idx_bank_transaction_date
+            columns:
+              - column:
+                  name: transaction_date
+
+  - changeSet:
+      id: 004-add-index-bank-account-date
+      author: guillaume
+      changes:
+        - createIndex:
+            tableName: bank_transaction
+            indexName: idx_bank_transaction_account_date
+            columns:
+              - column:
+                  name: bank_account_id
+              - column:
+                  name: transaction_date
